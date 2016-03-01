@@ -8,8 +8,8 @@
 
 import UIKit
 
-class MasterViewController: UITableViewController {
-
+class MasterViewController: UITableViewController
+{
     var projects = [[String]]()
 
     override func viewDidLoad()
@@ -31,26 +31,56 @@ class MasterViewController: UITableViewController {
     {
         
     }
+    
+    // MARK: - VC Methods
+    
+    func makeAttributedString(title title: String, subtitle: String) -> NSAttributedString
+    {
+        let titleAttributes = [NSFontAttributeName: UIFont.preferredFontForTextStyle(UIFontTextStyleHeadline), NSForegroundColorAttributeName: UIColor.purpleColor()]
+        let subtitleAttributes = [NSFontAttributeName: UIFont.preferredFontForTextStyle(UIFontTextStyleSubheadline)]
+        
+        let titleString = NSMutableAttributedString(string: "\(title)\n", attributes: titleAttributes)
+        let subtitleString = NSAttributedString(string: subtitle, attributes: subtitleAttributes)
+        
+        titleString.appendAttributedString(subtitleString)
+        
+        return titleString
+    }
 
     // MARK: - Table View
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSectionsInTableView(tableView: UITableView) -> Int
+    {
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int
+    {
         return projects.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell
     {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
+        let project = projects[indexPath.row]
+        cell.textLabel?.attributedText = makeAttributedString(title: project[0], subtitle: project[1])
+        cell.textLabel?.numberOfLines = 0
         return cell
     }
 
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath)
     {
         
+    }
+    
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat
+    {
+        return UITableViewAutomaticDimension
+    }
+    
+    override func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat
+    {
+        return UITableViewAutomaticDimension
     }
 }
 
