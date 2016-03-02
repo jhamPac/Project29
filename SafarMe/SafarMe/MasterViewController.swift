@@ -80,10 +80,14 @@ class MasterViewController: UITableViewController
     
     func showTutorial(which: Int)
     {
-        
+        if let url = NSURL(string: "https://www.hackingwithswift.com/read/\(which + 1)")
+        {
+            let vc = SFSafariViewController(URL: url, entersReaderIfAvailable: true)
+            presentViewController(vc, animated: true, completion: nil)
+        }
     }
 
-    // MARK: - Table View
+    // MARK: - TableView DataSource Protocols
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int
     {
@@ -106,6 +110,13 @@ class MasterViewController: UITableViewController
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath)
     {
         
+    }
+    
+    // MARK: - TableView Delegate Protocols
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath)
+    {
+        showTutorial(indexPath.row)
     }
     
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat
