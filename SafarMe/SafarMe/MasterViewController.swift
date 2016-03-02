@@ -7,22 +7,26 @@
 //
 
 import UIKit
+import SafariServices
+
+typealias Projects = [(title: String, description: String)]
 
 class MasterViewController: UITableViewController
 {
-    var projects = [[String]]()
+    var projects: Projects = [
+        (title: "Project 1: Storm Viewer", description: "Constants and variables, UITableView, UIImageView, NSFileManager, storyboards"),
+        (title: "Project 2: Guess the Flag", description: "@2x and @3x images, asset catalogs, integers, doubles, floats, operators (+= and -=), UIButton, enums, CALayer, UIColor, random numbers, actions, string interpolation, UIAlertController"),
+        (title: "Project 3: Social Media", description: "UIBarButtonItem, UIActivityViewController, the Social framework, NSURL"),
+        (title: "Project 4: Easy Browser", description: "loadView(), WKWebView, delegation, classes and structs, NSURLRequest, UIToolbar, UIProgressView., key-value observing"),
+        (title: "Project 5: Word Scramble", description: "NSString, closures, method return values, booleans, NSRange"),
+        (title: "Project 6: Auto Layout", description: "Get to grips with Auto Layout using practical examples and code"),
+        (title: "Project 1: Storm Viewer", description: "Constants and variables, UITableView, UIImageView, NSFileManager, storyboards"),
+        (title: "Project 7: Whitehouse Petitions", description: "JSON, NSData, UITabBarController")
+    ]
 
     override func viewDidLoad()
     {
         super.viewDidLoad()
-        
-        projects.append(["Project 1: Storm Viewer", "Constants and variables, UITableView, UIImageView, NSFileManager, storyboards"])
-        projects.append(["Project 2: Guess the Flag", "@2x and @3x images, asset catalogs, integers, doubles, floats, operators (+= and -=), UIButton, enums, CALayer, UIColor, random numbers, actions, string interpolation, UIAlertController"])
-        projects.append(["Project 3: Social Media", "UIBarButtonItem, UIActivityViewController, the Social framework, NSURL"])
-        projects.append(["Project 4: Easy Browser", "loadView(), WKWebView, delegation, classes and structs, NSURLRequest, UIToolbar, UIProgressView., key-value observing"])
-        projects.append(["Project 5: Word Scramble", "NSString, closures, method return values, booleans, NSRange"])
-        projects.append(["Project 6: Auto Layout", "Get to grips with Auto Layout using practical examples and code"])
-        projects.append(["Project 7: Whitehouse Petitions", "JSON, NSData, UITabBarController"])
     }
 
     // MARK: - Segues
@@ -62,8 +66,7 @@ class MasterViewController: UITableViewController
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell
     {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
-        let project = projects[indexPath.row]
-        cell.textLabel?.attributedText = makeAttributedString(title: project[0], subtitle: project[1])
+        cell.textLabel?.attributedText = makeAttributedString(title: projects[indexPath.row].title, subtitle: projects[indexPath.row].description)
         cell.textLabel?.numberOfLines = 0
         return cell
     }
