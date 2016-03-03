@@ -7,7 +7,9 @@
 //
 
 import UIKit
+import CoreSpotlight
 import SafariServices
+import MobileCoreServices
 
 typealias Projects = [(title: String, description: String)]
 
@@ -32,10 +34,27 @@ class MasterViewController: UITableViewController
         (title: "Project 1: Storm Viewer", description: "Constants and variables, UITableView, UIImageView, NSFileManager, storyboards"),
         (title: "Project 7: Whitehouse Petitions", description: "JSON, NSData, UITabBarController")
     ]
+    
+    /**
+     The user selected favorites for bookmarking
+     
+     - Remark: The integers corresponds with the projects Integers
+     */
+    var favorites = [Int]()
 
     override func viewDidLoad()
     {
         super.viewDidLoad()
+        
+        let defaults = NSUserDefaults.standardUserDefaults()
+        if let savedFavorites = defaults.objectForKey("favorites")  as? [Int]
+        {
+            favorites = savedFavorites
+        }
+        
+        // tableView allow editing
+        tableView.editing = true
+        tableView.allowsSelectionDuringEditing = true
     }
 
     // MARK: - Segues
@@ -86,6 +105,40 @@ class MasterViewController: UITableViewController
             presentViewController(vc, animated: true, completion: nil)
         }
     }
+    
+    func indexItem(which: Int)
+    {
+        let project = projects[which]
+        
+        let attributeSet = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
+        attributeSet.title = project.title
+        attributeSet.contentDescription = project.description
+        
+        let item = CSSearchableItem(uniqueIdentifier: "\(which)", domainIdentifier: "com.jhmpac", attributeSet: attributeSet)
+        item.expirationDate = NSDate.distantFuture()
+        
+        CSSearchableIndex.defaultSearchableIndex().indexSearchableItems([item]) { (error: NSError?) -> Void in
+            if let error = error
+            {
+                print(error.localizedDescription)
+            }
+            else
+            {
+                print("Search item successfully indexed")
+            }
+        }
+    }
+    
+    func deindexItem(which: Int)
+    {
+        CSSearchableIndex.defaultSearchableIndex().deleteSearchableItemsWithIdentifiers(["\(which)"]) { (error: NSError?) -> Void in
+            if let error = error {
+                print("Deindexing error: \(error.localizedDescription)")
+            } else {
+                print("Search item successfully removed!")
+            }
+        }
+    }
 
     // MARK: - TableView DataSource Protocols
 
@@ -104,12 +157,39 @@ class MasterViewController: UITableViewController
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
         cell.textLabel?.attributedText = makeAttributedString(title: projects[indexPath.row].title, subtitle: projects[indexPath.row].description)
         cell.textLabel?.numberOfLines = 0
+        
+        if favorites.contains(indexPath.row)
+        {
+            cell.editingAccessoryType = .Checkmark
+        }
+        else
+        {
+            cell.editingAccessoryType = .None
+        }
+        
         return cell
     }
 
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath)
     {
+        if editingStyle == .Insert
+        {
+            favorites.append(indexPath.row)
+            indexItem(indexPath.row)
+        }
+        else
+        {
+            if let index = favorites.indexOf(indexPath.row)
+            {
+                favorites.removeAtIndex(index)
+                deindexItem(indexPath.row)
+            }
+        }
         
+        let defaults = NSUserDefaults.standardUserDefaults()
+        defaults.setObject(favorites, forKey: "favorites")
+        
+        tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
     }
     
     // MARK: - TableView Delegate Protocols
@@ -127,6 +207,18 @@ class MasterViewController: UITableViewController
     override func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat
     {
         return UITableViewAutomaticDimension
+    }
+    
+    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle
+    {
+        if favorites.contains(indexPath.row)
+        {
+            return .Delete
+        }
+        else
+        {
+            return .Insert
+        }
     }
 }
 

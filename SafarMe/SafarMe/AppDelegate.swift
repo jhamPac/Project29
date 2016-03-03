@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreSpotlight
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
@@ -42,6 +43,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    }
+    
+    func application(application: UIApplication, continueUserActivity userActivity: NSUserActivity, restorationHandler: ([AnyObject]?) -> Void) -> Bool
+    {
+        if userActivity.activityType == CSSearchableItemActionType
+        {
+            if let uniqueIdentifier = userActivity.userInfo?[CSSearchableItemActivityIdentifier] as? String
+            {
+                let splitViewController = self.window!.rootViewController as! UISplitViewController
+                let navigationController = splitViewController.viewControllers[splitViewController.viewControllers.count - 1] as! UINavigationController
+                
+                if let masterVC = navigationController.topViewController as? MasterViewController
+                {
+                    masterVC.showTutorial(Int(uniqueIdentifier)!)
+                }
+            }
+        }
+        
+        return true
     }
 
     // MARK: - Split view
